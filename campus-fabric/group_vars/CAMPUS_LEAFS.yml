@@ -1,0 +1,4 @@
+---
+### group_vars/CAMPUS_LEAFS.yml
+
+type: leaf     # Must be leaf

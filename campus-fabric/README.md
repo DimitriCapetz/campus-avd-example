@@ -91,11 +91,11 @@ Basic connectivity between the Ansible controller host and the switches must be 
 
     The management interfaces used by cEOS and vEOS, are `Management0` and `Management1`, respectively. When using actual hardware switches, `Management1` is used. The included basic switch configurations may need to be adjusted for your environment.
 
-Below is the basic configuration file for SPINE1:
+Below is the basic configuration file for spine-1:
 
 ``` shell
 --8<--
-examples/campus-fabric/switch-basic-configurations/SPINE1.cfg
+examples/campus-fabric/switch-basic-configurations/spine-1.cfg
 --8<--
 ```
 
@@ -126,7 +126,7 @@ This naming convention makes it possible to extend anything quickly and can be c
 
 The below inventory file represents two spines and ten leafs. The nodes are defined under the groups DC1_SPINES and DC1_LEAFS, respectively. We apply group variables (group_vars) to these groups to define their functionality and configurations.
 
-The hostnames specified in the inventory must exist either in DNS or in the hosts file on your Ansible host to allow successful name lookup and be able to reach the switches directly. A successful ping from the Ansible host to each inventory host verifies name resolution (e.g., ping SPINE1).
+The hostnames specified in the inventory must exist either in DNS or in the hosts file on your Ansible host to allow successful name lookup and be able to reach the switches directly. A successful ping from the Ansible host to each inventory host verifies name resolution (e.g., ping spine-1).
 
 If DNS is unavailable, define the variable ansible_host as an IP address for each device.
 
@@ -151,16 +151,16 @@ Details on this feature can be found [here](../../roles/eos_designs/docs/input-v
 
 | Node   | Management0     | Vlan10    |
 | ------ | --------------- | --------- |
-| SPINE1 | 172.100.100.101 | 10.10.10.2  |
-| SPINE2 | 172.100.100.102 | 10.10.10.3  |
-| LEAF1A | 172.100.100.103 | 10.10.10.6  |
-| LEAF1B | 172.100.100.104 | 10.10.10.7  |
-| LEAF2A | 172.100.100.105 | 10.10.10.8  |
-| LEAF3A | 172.100.100.106 | 10.10.10.9  |
-| LEAF3B | 172.100.100.107 | 10.10.10.10 |
-| LEAF3C | 172.100.100.108 | 10.10.10.11 |
-| LEAF3D | 172.100.100.109 | 10.10.10.12 |
-| LEAF3E | 172.100.100.110 | 10.10.10.13 |
+| spine-1 | 172.100.100.101 | 10.10.10.2  |
+| spine-2 | 172.100.100.102 | 10.10.10.3  |
+| leaf-1a | 172.100.100.103 | 10.10.10.6  |
+| leaf-1b | 172.100.100.104 | 10.10.10.7  |
+| leaf-2a | 172.100.100.105 | 10.10.10.8  |
+| leaf-3a | 172.100.100.106 | 10.10.10.9  |
+| leaf-3b | 172.100.100.107 | 10.10.10.10 |
+| member-leaf-3c | 172.100.100.108 | 10.10.10.11 |
+| member-leaf-3d | 172.100.100.109 | 10.10.10.12 |
+| member-leaf-3e | 172.100.100.110 | 10.10.10.13 |
 
 In Campus Networks, having a dedicated out-of-band management network in each IDF is uncommon. Therefore, you can easily disable configuring the Management0 interface and the management VRF by adding these variables to the `DC1_LEAFS.yml` group_vars.
 
@@ -207,7 +207,7 @@ The tabs below show the Ansible **group_vars** used in this example.
 
     Variables applied under the node key type (spine/leaf) defaults section are inherited by nodes under each type. These variables may be overwritten under the node itself.
 
-    The spine interface used by a particular leaf is defined from the leaf's perspective with a variable called `uplink_switch_interfaces`. For example, LEAF2A has a unique variable `uplink_switch_interfaces: [Ethernet49/1, Ethernet49/1]` defined. This means that LEAF2A is connected to SPINE1's Ethernet49/1 and SPINE2's Ethernet49/1, respectively.
+    The spine interface used by a particular leaf is defined from the leaf's perspective with a variable called `uplink_switch_interfaces`. For example, leaf-2a has a unique variable `uplink_switch_interfaces: [Ethernet49/1, Ethernet49/1]` defined. This means that leaf-2a is connected to spine-1's Ethernet49/1 and spine-2's Ethernet49/1, respectively.
 
     ``` yaml
     --8<--
@@ -283,11 +283,11 @@ underlay_routing_protocol: ospf
 core_interfaces:
   p2p_links:
     - ip: [ 10.0.0.3/31, 10.0.0.2/31 ]
-      nodes: [ SPINE1, WAN ]
+      nodes: [ spine-1, WAN ]
       interfaces: [ Ethernet52/1, Ethernet1/1 ]
       include_in_underlay_protocol: true
     - ip: [ 10.0.0.5/31, 10.0.0.4/31 ]
-      nodes: [ SPINE2, WAN ]
+      nodes: [ spine-2, WAN ]
       interfaces: [ Ethernet52/1, Ethernet1/1 ]
       include_in_underlay_protocol: true
 ```
@@ -336,83 +336,83 @@ ansible-playbook deploy.yml
 
 Your configuration files should be similar to these.
 
-=== "SPINE1"
+=== "spine-1"
 
     ``` shell
     --8<--
-    examples/campus-fabric/intended/configs/SPINE1.cfg
+    examples/campus-fabric/intended/configs/spine-1.cfg
     --8<--
     ```
 
-=== "SPINE2"
+=== "spine-2"
 
     ``` shell
     --8<--
-    examples/campus-fabric/intended/configs/SPINE2.cfg
+    examples/campus-fabric/intended/configs/spine-2.cfg
     --8<--
     ```
 
-=== "LEAF1A"
+=== "leaf-1a"
 
     ``` shell
     --8<--
-    examples/campus-fabric/intended/configs/LEAF1A.cfg
+    examples/campus-fabric/intended/configs/leaf-1a.cfg
     --8<--
     ```
 
-=== "LEAF1B"
+=== "leaf-1b"
 
     ``` shell
     --8<--
-    examples/campus-fabric/intended/configs/LEAF1B.cfg
+    examples/campus-fabric/intended/configs/leaf-1b.cfg
     --8<--
     ```
 
-=== "LEAF2A"
+=== "leaf-2a"
 
     ``` shell
     --8<--
-    examples/campus-fabric/intended/configs/LEAF2A.cfg
+    examples/campus-fabric/intended/configs/leaf-2a.cfg
     --8<--
     ```
 
-=== "LEAF3A"
+=== "leaf-3a"
 
     ``` shell
     --8<--
-    examples/campus-fabric/intended/configs/LEAF3A.cfg
+    examples/campus-fabric/intended/configs/leaf-3a.cfg
     --8<--
     ```
 
-=== "LEAF3B"
+=== "leaf-3b"
 
     ``` shell
     --8<--
-    examples/campus-fabric/intended/configs/LEAF3B.cfg
+    examples/campus-fabric/intended/configs/leaf-3b.cfg
     --8<--
     ```
 
-=== "LEAF3C"
+=== "member-leaf-3c"
 
     ``` shell
     --8<--
-    examples/campus-fabric/intended/configs/LEAF3C.cfg
+    examples/campus-fabric/intended/configs/member-leaf-3c.cfg
     --8<--
     ```
 
-=== "LEAF3D"
+=== "member-leaf-3d"
 
     ``` shell
     --8<--
-    examples/campus-fabric/intended/configs/LEAF3D.cfg
+    examples/campus-fabric/intended/configs/member-leaf-3d.cfg
     --8<--
     ```
 
-=== "LEAF3E"
+=== "member-leaf-3e"
 
     ``` shell
     --8<--
-    examples/campus-fabric/intended/configs/LEAF3E.cfg
+    examples/campus-fabric/intended/configs/member-leaf-3e.cfg
     --8<--
     ```
 
